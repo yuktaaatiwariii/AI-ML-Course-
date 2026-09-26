@@ -1,1 +1,404 @@
+# Exercise 02: Telecom Data Cleaning Using Python and Pandas
+
+## Overview
+
+This exercise focuses on preparing raw telecom usage data for analysis using Python and the Pandas library.
+
+The practical involved creating a CSV dataset, loading it into a Pandas DataFrame, identifying and handling missing values, removing duplicate records, standardising date information, and exporting the cleaned dataset.
+
+The exercise demonstrates the importance of data preprocessing in telecom analytics, where raw operational data may contain inconsistencies that affect the reliability of downstream analysis.
+
+**Domain:** Telecom Data Analytics
+**Programming Language:** Python
+**Library:** Pandas
+**Environment:** Jupyter Notebook (Anaconda)
+**Input Format:** CSV
+
+---
+
+## 1. Objectives
+
+The objectives of this exercise were to:
+
+* Set up a Python environment using Anaconda and Jupyter Notebook.
+* Create and load a telecom usage dataset using Pandas.
+* Inspect dataset dimensions and records.
+* Identify and handle missing values.
+* Remove duplicate records.
+* Convert date columns into a standard datetime format.
+* Export cleaned data into CSV files.
+* Verify the final dataset after preprocessing.
+
+---
+
+## 2. Environment Setup
+
+### Tools Used
+
+| Tool             | Purpose                                   |
+| ---------------- | ----------------------------------------- |
+| Python           | Data processing and scripting             |
+| Anaconda         | Python environment and package management |
+| Jupyter Notebook | Interactive coding and execution          |
+| Pandas           | Data manipulation and cleaning            |
+| CSV              | Input and output data format              |
+
+### Working Directory
+
+Created a folder named `training_p` to store the dataset, notebook, and generated output files.
+
+Created a Jupyter Notebook named:
+
+`training.ipynb`
+
+The notebook was used to execute Python commands interactively and inspect intermediate results.
+
+---
+
+## 3. Dataset Description
+
+The dataset `telecom_usage.csv` contains sample telecom customer usage information.
+
+### Dataset Columns
+
+| Column       | Description                           |
+| ------------ | ------------------------------------- |
+| customer_id  | Unique customer identifier            |
+| data_used_gb | Internet data consumption in GB       |
+| calls_made   | Number of calls made                  |
+| revenue_inr  | Revenue generated in INR              |
+| region       | Customer's geographical region        |
+| date         | Date associated with the usage record |
+
+### Data Quality Issues Introduced
+
+The sample dataset contains several common data-quality issues:
+
+1. Missing values in data usage and revenue fields.
+2. Duplicate customer usage records.
+3. Inconsistent date formats.
+4. Inconsistent region-name capitalization.
+5. A malformed record requiring inspection.
+
+These issues were useful for understanding why raw data must be validated before analysis.
+
+---
+
+## 4. Practical Implementation
+
+### Step 1: Import Pandas and Load the Dataset
+
+```python
+import pandas as pd
+
+df = pd.read_csv("telecom_usage.csv")
+
+print("Original shape:", df.shape)
+
+df.head()
+```
+
+**What I did:**
+
+* Imported the Pandas library.
+* Loaded the CSV file into a DataFrame.
+* Checked the dataset dimensions using `shape`.
+* Displayed the first five records using `head()`.
+
+**Concepts learned:**
+
+* Importing Python libraries.
+* Reading CSV files.
+* Pandas DataFrames.
+* Dataset inspection.
+
+**Why it matters:**
+
+Before cleaning a dataset, it is important to understand its structure, number of records, and available columns.
+
+---
+
+### Step 2: Handle Missing Values
+
+```python
+before = len(df)
+
+df = df.dropna()
+
+after = len(df)
+
+print(f"Removed {before - after} rows with missing values.")
+
+df.to_csv("missing_telecom_usage.csv", index=False)
+
+print("Saved missing_telecom_usage.csv with", len(df), "rows.")
+```
+
+**What I did:**
+
+* Counted the records before cleaning.
+* Removed rows containing missing values using `dropna()`.
+* Compared the record count before and after removal.
+* Exported the resulting dataset to a new CSV file.
+
+**Concepts learned:**
+
+* Missing-value handling.
+* `dropna()`.
+* Record counting using `len()`.
+* Comparing dataset dimensions before and after preprocessing.
+* Exporting DataFrames using `to_csv()`.
+
+**What I understood:**
+
+Missing values can affect calculations, statistical summaries, and machine-learning algorithms.
+
+Removing incomplete records is one approach to handling missing data, although the appropriate method depends on the dataset and analytical requirement.
+
+---
+
+### Step 3: Standardise Date Formats
+
+```python
+df = df.dropna(subset=["date"])
+
+df["date"] = pd.to_datetime(
+    df["date"],
+    errors="coerce"
+)
+
+bad_dates = df["date"].isna().sum()
+
+print("Unparseable date rows:", bad_dates)
+```
+
+**What I did:**
+
+* Checked for missing dates.
+* Converted the date column into Pandas datetime format.
+* Used `errors="coerce"` to convert unparseable date values into `NaT`.
+* Counted the resulting invalid or missing datetime values.
+
+**Concepts learned:**
+
+* Datetime data types.
+* `pd.to_datetime()`.
+* Missing datetime values (`NaT`).
+* Error handling during data conversion.
+
+**What I understood:**
+
+Date values may be represented in different formats in raw datasets. Converting them into a consistent datetime representation makes them easier to filter, sort, compare, and analyse.
+
+**Important observation:**
+
+The exercise asks students to decide whether unparseable dates should be corrected manually or removed. This decision should be made before treating the dataset as ready for analysis.
+
+---
+
+### Step 4: Remove Duplicate Records
+
+```python
+before = len(df)
+
+df = df.drop_duplicates(keep="first")
+
+after = len(df)
+
+print(f"Removed {before - after} duplicate rows.")
+print(f"Rows before: {before}")
+print(f"Rows after: {after}")
+```
+
+**What I did:**
+
+* Counted the records before duplicate removal.
+* Used `drop_duplicates()` to remove repeated rows.
+* Retained the first occurrence of each duplicate record.
+* Compared the row counts after cleaning.
+
+**Concepts learned:**
+
+* Duplicate detection and removal.
+* `drop_duplicates()`.
+* The `keep` parameter.
+* Data consistency.
+
+**What I understood:**
+
+Duplicate records can distort aggregate calculations and produce misleading analytical results.
+
+For example, repeated usage records could artificially increase calculated customer consumption or revenue.
+
+---
+
+### Step 5: Export the Cleaned Dataset
+
+```python
+df.to_csv(
+    "cleaned_telecom_usage.csv",
+    index=False
+)
+
+print(
+    "Saved cleaned_telecom_usage.csv with",
+    len(df),
+    "rows."
+)
+```
+
+**What I did:**
+
+Saved the processed DataFrame into a separate CSV file.
+
+The `index=False` parameter prevents Pandas from writing its DataFrame index as an additional column.
+
+**Concepts learned:**
+
+* Exporting processed datasets.
+* `to_csv()`.
+* Creating reusable data outputs.
+* Separating raw and processed data.
+
+---
+
+### Step 6: Verify the Final Dataset
+
+```python
+import pandas as pd
+
+pd.set_option("display.max_rows", None)
+
+cleaned_df = pd.read_csv("cleaned_telecom_usage.csv")
+
+display(cleaned_df)
+```
+
+**What I did:**
+
+* Reloaded the exported CSV file.
+* Displayed the records to verify the saved output.
+* Checked the final dataset after preprocessing.
+
+**What I understood:**
+
+Data cleaning is not complete until the resulting dataset has been checked. Verification helps confirm that the output was saved and can be loaded successfully.
+
+---
+
+## 5. Data Cleaning Workflow
+
+```text
+Raw Telecom CSV
+       |
+       v
+Load using Pandas
+       |
+       v
+Inspect Dataset
+       |
+       v
+Handle Missing Values
+       |
+       v
+Standardise Date Column
+       |
+       v
+Remove Duplicate Records
+       |
+       v
+Export Cleaned Dataset
+       |
+       v
+Reload and Verify
+       |
+       v
+Cleaned Telecom Data
+```
+
+---
+
+## 6. Results and Observations
+
+The exercise generated the following files:
+
+| File                        | Description                                    |
+| --------------------------- | ---------------------------------------------- |
+| `telecom_usage.csv`         | Original sample dataset                        |
+| `missing_telecom_usage.csv` | Dataset after missing-value removal            |
+| `cleaned_telecom_usage.csv` | Final processed dataset                        |
+| `training.ipynb`            | Notebook containing implementation and outputs |
+
+### Record Count Checkpoint
+
+Record the actual values printed by your notebook:
+
+| Stage                       | Number of Records    |
+| --------------------------- | -------------------- |
+| Original dataset            | [Enter actual count] |
+| After missing-value removal | [Enter actual count] |
+| After duplicate removal     | [Enter actual count] |
+| After date validation       | [Enter actual count] |
+| Final exported dataset      | [Enter actual count] |
+
+*Note: The final counts should be taken from the executed notebook rather than assumed.*
+
+---
+
+## 7. Key Learnings
+
+Through this exercise, I learned how Python and Pandas can be used to prepare raw datasets for reliable analysis.
+
+### Technical Learnings
+
+1. **DataFrame Operations:** Learned to load, inspect, manipulate, and export tabular datasets using Pandas.
+
+2. **Missing-Value Handling:** Understood how incomplete records can affect analytical results and how `dropna()` can be used to remove them.
+
+3. **Date Standardisation:** Learned to convert date strings into datetime values and identify invalid dates using `errors="coerce"`.
+
+4. **Duplicate Removal:** Understood how repeated records can affect data quality and aggregate calculations.
+
+5. **Data Validation:** Learned to compare record counts and inspect the exported dataset after preprocessing.
+
+6. **Data Pipeline Fundamentals:** Understood how raw data is transformed into a cleaner dataset that can be used for subsequent analysis.
+
+---
+
+## 8. Telecom Analytics Applications
+
+Data cleaning is an important preliminary step in telecom analytics.
+
+The techniques practiced in this exercise can support:
+
+* Customer usage analysis.
+* Revenue reporting.
+* Regional performance analysis.
+* Customer segmentation.
+* Churn prediction.
+* Machine-learning dataset preparation.
+
+For example, missing usage values or duplicate customer records can affect the reliability of customer-level statistics and predictive models.
+
+---
+
+## 9. Further Exploration
+
+Possible improvements and extensions include:
+
+* Compare missing-value removal with mean or median imputation.
+* Standardise inconsistent region names.
+* Validate numerical columns and identify invalid values.
+* Investigate whether duplicate records represent genuine duplicates or repeated customer activity.
+* Calculate total and average data usage by region.
+* Compare dataset dimensions before and after every cleaning operation.
+* Build a reusable cleaning function for multiple telecom CSV files.
+
+---
+
+## Conclusion
+
+This practical established a foundation in Python-based data preprocessing.
+
+By loading, inspecting, cleaning, transforming, exporting, and verifying telecom usage data, I gained hands-on experience with essential Pandas operations and understood their importance in preparing reliable datasets for downstream analytics and machine-learning workflows.
 
