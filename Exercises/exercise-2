@@ -329,20 +329,6 @@ The exercise generated the following files:
 | `cleaned_telecom_usage.csv` | Final processed dataset                        |
 | `training.ipynb`            | Notebook containing implementation and outputs |
 
-### Record Count Checkpoint
-
-Record the actual values printed by your notebook:
-
-| Stage                       | Number of Records    |
-| --------------------------- | -------------------- |
-| Original dataset            | [Enter actual count] |
-| After missing-value removal | [Enter actual count] |
-| After duplicate removal     | [Enter actual count] |
-| After date validation       | [Enter actual count] |
-| Final exported dataset      | [Enter actual count] |
-
-*Note: The final counts should be taken from the executed notebook rather than assumed.*
-
 ---
 
 ## 7. Key Learnings
