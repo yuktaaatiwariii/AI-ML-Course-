@@ -1,1 +1,285 @@
+# Exercise 01: Essential SQL Operations for Telecom Analytics
+
+## Overview
+
+This exercise focuses on using SQL to retrieve, filter, combine, and aggregate telecom customer data to derive meaningful business insights.
+
+The practical involved creating a relational database, importing customer and usage information, executing SQL queries, and analysing customer usage patterns and regional revenue.
+
+**Domain:** Telecom Data Analytics
+**Database:** MySQL
+**Tool:** MySQL Workbench
+**Language:** SQL
+
+---
+
+## 1. Objectives
+
+The objectives of this exercise were to:
+
+* Create and populate relational database tables.
+* Retrieve and filter telecom usage records using SQL.
+* Identify customers with high data consumption.
+* Combine customer and usage information using JOIN operations.
+* Aggregate data using GROUP BY and AVG().
+* Analyse revenue patterns across customer plans and regions.
+* Translate query results into business insights.
+
+---
+
+## 2. Dataset Description
+
+Two sample datasets were used in this exercise.
+
+### A. usage_data
+
+Contains customer-level telecom usage and revenue information.
+
+| Column          | Description                    |
+| --------------- | ------------------------------ |
+| customer_id     | Unique customer identifier     |
+| data_used_in_GB | Internet consumption in GB     |
+| calls_made      | Number of calls made           |
+| revenue_inr     | Revenue generated in INR       |
+| region          | Customer's geographical region |
+
+### B. customers
+
+Contains customer profile information.
+
+| Column      | Description                |
+| ----------- | -------------------------- |
+| customer_id | Unique customer identifier |
+| name        | Customer name              |
+| plan_type   | Prepaid or Postpaid        |
+| join_date   | Customer registration date |
+
+The `customer_id` column acts as the common identifier between the two tables.
+
+---
+
+## 3. Database Setup
+
+Created a MySQL database named `testdb` and selected it for executing the queries.
+
+```sql
+CREATE DATABASE testdb;
+
+USE testdb;
+```
+
+Created two relational tables:
+
+* `usage_data`
+* `customers`
+
+The tables were populated with the sample telecom records provided in the exercise.
+
+### Concepts learned
+
+* Database creation
+* Table creation
+* Data types such as INT, FLOAT, VARCHAR, and DATE
+* INSERT statements
+* Relational data organization
+* Common identifiers between tables
+
+---
+
+## 4. Practical Implementation
+
+### Task 1: Filtering High-Usage Customers
+
+**Business Requirement:** Identify customers consuming more than 10 GB of internet data.
+
+```sql
+SELECT customer_id, data_used_in_GB
+FROM usage_data
+WHERE data_used_in_GB > 10
+ORDER BY data_used_in_GB DESC;
+```
+
+**SQL concepts used:**
+
+* `SELECT` retrieves the required columns.
+* `FROM` specifies the source table.
+* `WHERE` filters records based on a condition.
+* `ORDER BY` sorts the resulting records.
+* `DESC` sorts values in descending order.
+
+**Expected result:**
+
+| customer_id | data_used_in_GB |
+| ----------- | --------------: |
+| 1004        |            15.6 |
+| 1002        |            12.5 |
+
+**What I learned:**
+
+I learned how to filter structured telecom data using conditional expressions and arrange the results based on usage.
+
+This query helps identify high-usage customers who may be relevant for premium data plans, targeted marketing, or network capacity planning.
+
+---
+
+### Task 2: Combining Customer and Usage Data Using JOIN
+
+**Business Requirement:** Combine customer profile information with telecom usage records.
+
+```sql
+SELECT
+    c.customer_id,
+    c.name,
+    c.plan_type,
+    u.data_used_in_GB,
+    u.region,
+    u.revenue_inr
+FROM customers c
+INNER JOIN usage_data u
+    ON c.customer_id = u.customer_id;
+```
+
+**Concepts learned:**
+
+* `JOIN` combines records from related tables.
+* `INNER JOIN` returns records with matching keys in both tables.
+* Table aliases (`c` and `u`) make queries easier to read.
+* The `ON` clause specifies the relationship between tables.
+
+**What I learned:**
+
+I understood how relational databases store information across multiple tables and how JOIN operations combine that information for analysis.
+
+For example, customer names and plan types can be combined with their usage and revenue to understand customer behaviour.
+
+**Telecom application:**
+
+Combining customer profiles with usage records enables segmentation by plan type, regional usage analysis, and targeted customer campaigns.
+
+---
+
+### Task 3: Regional Usage Analysis Using GROUP BY
+
+**Business Requirement:** Calculate the average data consumption for each region.
+
+```sql
+SELECT
+    region,
+    AVG(data_used_in_GB) AS avg_usage
+FROM usage_data
+GROUP BY region
+ORDER BY avg_usage DESC;
+```
+
+**Concepts learned:**
+
+* `AVG()` calculates the arithmetic mean.
+* `GROUP BY` groups records sharing the same region.
+* Aggregate functions summarize multiple records.
+* Aliases provide meaningful names to calculated columns.
+
+**Expected result:**
+
+| Region  | Average Usage (GB) |
+| ------- | -----------------: |
+| Mumbai  |               12.5 |
+| Delhi   |               10.4 |
+| Chennai |                7.8 |
+| Kolkata |                3.4 |
+
+**What I learned:**
+
+I learned how aggregation transforms individual customer records into regional summaries.
+
+Instead of analysing every customer separately, GROUP BY allows us to identify broader patterns across geographical regions.
+
+**Telecom application:**
+
+Regional usage summaries can support network capacity planning, resource allocation, and regional performance reporting.
+
+---
+
+### Task 4: Revenue Analysis by Plan Type and Region
+
+**Business Requirement:** Analyse average revenue across customer plans and geographical regions to identify potential premium upselling opportunities.
+
+```sql
+SELECT
+    c.plan_type,
+    u.region,
+    AVG(u.revenue_inr) AS avg_revenue
+FROM customers c
+JOIN usage_data u
+    ON c.customer_id = u.customer_id
+GROUP BY
+    c.plan_type,
+    u.region
+ORDER BY avg_revenue DESC;
+```
+
+**Concepts learned:**
+
+* Combining JOIN and GROUP BY.
+* Aggregating revenue using AVG().
+* Grouping data using multiple columns.
+* Analysing customer segments.
+* Translating query results into business requirements.
+
+**What I learned:**
+
+I learned how SQL can combine customer attributes with revenue data to support business analysis.
+
+Grouping by both plan type and region provides a more detailed view than analysing revenue using only one dimension.
+
+**Business application:**
+
+Telecom companies can use this type of analysis to investigate customer segments, identify potential premium-plan opportunities, and support targeted marketing strategies.
+
+**Important observation:**
+
+The sample dataset contains only five customers. Therefore, the results demonstrate the analytical method rather than establish reliable business-wide revenue trends.
+
+---
+
+## 5. Key Concepts Learned
+
+| SQL Concept     | Purpose                        |
+| --------------- | ------------------------------ |
+| CREATE DATABASE | Creates a database             |
+| CREATE TABLE    | Defines table structure        |
+| INSERT INTO     | Adds records                   |
+| SELECT          | Retrieves data                 |
+| WHERE           | Filters records                |
+| ORDER BY        | Sorts query results            |
+| DESC            | Sorts in descending order      |
+| INNER JOIN      | Combines matching records      |
+| GROUP BY        | Groups records for aggregation |
+| AVG()           | Calculates average values      |
+| Table Aliases   | Improves query readability     |
+
+---
+
+## 6. Key Learnings
+
+Through this practical, I developed an understanding of how SQL supports telecom data analytics.
+
+The main takeaways were:
+
+1. Relational databases organize information into tables connected through common identifiers.
+2. Filtering helps isolate records relevant to a particular business requirement.
+3. JOIN operations combine information distributed across multiple tables.
+4. Aggregate functions summarize customer-level data into meaningful metrics.
+5. GROUP BY enables multidimensional analysis across regions and customer segments.
+6. SQL query results can be translated into business insights for marketing, revenue analysis, and network planning.
+
+---
+
+## 7. Practical Challenges and Observations
+
+* Understanding how customer records are connected across tables using `customer_id`.
+* Distinguishing between filtering individual records and aggregating grouped records.
+* Understanding how multiple columns affect GROUP BY results.
+* Ensuring that sorting is applied to the calculated aggregate rather than a text literal.
+
+
 
