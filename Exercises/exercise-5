@@ -1,0 +1,148 @@
+# Exercise 5: Processing Big Datasets Efficiently (Chunk-Based Reading)
+
+## 1. Objective
+
+The objective of this exercise was to process a large simulated telecom dataset efficiently using pandas chunk-based reading.
+
+The experiment demonstrates how to:
+
+* Generate a simulated dataset containing 5 million telecom records.
+* Read a large CSV file in smaller batches using `chunksize`.
+* Calculate total data usage incrementally.
+* Count records with data usage greater than 50 GB.
+* Display processing progress using `tqdm`.
+* Validate the result by calculating average data usage.
+
+## 2. Tools and Libraries
+
+* Python 3
+* Anaconda
+* Jupyter Notebook
+* pandas — CSV reading and data aggregation
+* NumPy — generation of simulated telecom data
+* tqdm — progress display during chunk processing
+
+Install the required packages:
+
+```bash
+pip install pandas numpy tqdm
+```
+
+## 3. Dataset Description
+
+A simulated telecom dataset is generated with 5 million records.
+
+| Column          | Description                |
+| --------------- | -------------------------- |
+| `customer_id`   | Customer record identifier |
+| `data_used_gb`  | Data usage in gigabytes    |
+| `call_duration` | Simulated call duration    |
+| `region`        | Customer's region          |
+
+The generated data uses random values for usage and call duration, and randomly selects one of five regions: Delhi, Mumbai, Chennai, Kolkata, or Bangalore.
+
+The random seed is set to `42` so the generated random values can be reproduced when the same generation method and library behavior are used.
+
+## 4. Experiment Workflow
+
+```text
+Generate simulated telecom records
+              |
+              v
+       big_telecom_data.csv
+              |
+              v
+     Read CSV in 100,000-row chunks
+              |
+              v
+       Process one chunk at a time
+              |
+       +------+------+
+       |             |
+       v             v
+ Sum data usage   Count usage > 50 GB
+       |             |
+       +------+------+
+              |
+              v
+      Accumulate running totals
+              |
+              v
+       Display final results
+              |
+              v
+       Calculate average usage
+```
+
+## 5. Chunk-Based Processing
+
+Instead of loading all 5 million records into one DataFrame, pandas reads the CSV in batches of 100,000 rows.
+
+For each chunk, the program:
+
+1. Calculates the sum of `data_used_gb`.
+2. Counts records where `data_used_gb` is greater than 50 GB.
+3. Adds both results to running totals.
+4. Moves to the next chunk.
+
+This approach reduces the amount of dataset data held in the DataFrame at one time. Actual memory use depends on the data types, pandas overhead, Python environment, and other processes running on the system.
+
+## 6. Progress Tracking
+
+The `tqdm` library wraps the chunk iterator and displays a progress indicator while the dataset is being processed.
+
+This helps monitor a long-running operation and provides a visual indication of progress.
+
+## 7. Validation
+
+The experiment calculates average data usage using:
+
+```text
+Average data usage = Total data usage / Number of records
+```
+
+Because the generated data usage values are uniformly sampled between 0.1 GB and 100 GB, the expected average should be close to 50 GB.
+
+The exact result should be taken from the executed notebook rather than assumed in advance.
+
+## 8. Results
+
+Record the actual values displayed by your notebook here:
+
+| Metric                                | Result              |
+| ------------------------------------- | ------------------- |
+| Number of input records               | 5,000,000           |
+| Chunk size                            | 100,000 rows        |
+| Number of chunks processed            | 50                  |
+| Total data usage                      | Add executed result |
+| Records with usage greater than 50 GB | Add executed result |
+| Average data usage                    | Add executed result |
+
+## 9. Key Learnings
+
+Through this exercise, I learned how to:
+
+* Process large CSV files in smaller batches using pandas.
+* Use `chunksize` to avoid loading the complete dataset into a single DataFrame.
+* Perform incremental aggregation across chunks.
+* Count records that satisfy a condition.
+* Track processing progress using `tqdm`.
+* Validate aggregated results using an average.
+* Apply memory-conscious data-processing techniques to telecom datasets.
+
+## 10. Real-World Telecom Application
+
+Telecom systems generate large volumes of usage records, call-detail records, network activity, and customer events.
+
+Chunk-based processing can be useful when:
+
+* A CSV file is too large to comfortably load as one DataFrame.
+* A batch ETL pipeline processes daily or monthly usage exports.
+* Analysts need totals, counts, or other aggregations without retaining every row.
+* Data is being prepared for later analysis in a database or data warehouse.
+
+The same general idea of processing data in partitions is also relevant to distributed processing frameworks such as Apache Spark and Hadoop. However, pandas chunk processing runs within a single Python process and is not itself distributed computing.
+
+## 11. Conclusion
+
+This exercise demonstrated how to process a large simulated telecom dataset using pandas chunk-based reading. By reading 100,000 rows at a time and maintaining running totals, the program calculates total data usage and counts high-usage records without creating one full-size DataFrame during the analysis stage.
