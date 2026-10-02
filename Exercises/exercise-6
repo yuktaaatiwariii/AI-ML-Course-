@@ -1,0 +1,173 @@
+# Exercise 6: Simulating Role-Based Access (PII Masking)
+
+## Overview
+
+This exercise demonstrates how Role-Based Access Control (RBAC) can be used to protect sensitive customer information in telecom analytics.
+
+Different users may require different levels of access to customer data depending on their responsibilities. For example, a junior analyst may only need limited customer information, while a manager may require a broader view for reporting and decision-making.
+
+The exercise focuses on identifying Personally Identifiable Information (PII), applying data masking, creating role-specific data views, and maintaining an access audit log using Python and Pandas.
+
+## Objectives
+
+- Understand the concept of Role-Based Access Control (RBAC).
+- Identify sensitive customer information in a telecom dataset.
+- Apply masking techniques to protect PII.
+- Create different data views for different user roles.
+- Use Python and Pandas to process customer records.
+- Export role-specific datasets into CSV files.
+- Maintain an audit log of data access.
+- Understand how data masking supports customer privacy.
+
+## 1. Understanding Role-Based Access Control
+
+Role-Based Access Control is a method of restricting access to information based on the role assigned to a user.
+
+Instead of giving every user access to all available data, permissions are assigned according to their responsibilities.
+
+In a telecom analytics environment, different users may require different levels of access to customer information.
+
+For this exercise, the roles include:
+
+- **Junior Analyst:** Requires limited customer information for basic analysis.
+- **Senior Analyst:** Requires more detailed information for advanced analysis.
+- **Manager:** Requires a broader view of customer information for reporting and decision-making.
+
+The purpose is to ensure that users can access the information required for their work without unnecessarily exposing sensitive customer details.
+
+## 2. Identifying Personally Identifiable Information (PII)
+
+Personally Identifiable Information refers to information that can identify an individual or reveal personal details about them.
+
+Examples of PII in customer datasets include:
+
+- Customer names
+- Phone numbers
+- Email addresses
+- Residential addresses
+- Other personally identifying fields available in the dataset
+
+These fields require appropriate protection when customer data is used for analytics.
+
+In this exercise, sensitive fields are identified so that masking policies can be applied according to the user's role.
+
+## 3. Understanding Data Masking
+
+Data masking is a technique used to hide or partially hide sensitive information.
+
+The purpose of masking is to reduce the exposure of personal information while allowing users to work with the data they are authorized to access.
+
+For example, a phone number may be displayed with only a few digits visible, while the remaining digits are replaced with masking characters.
+
+Masking helps preserve the usefulness of a dataset for analysis without displaying all sensitive information.
+
+The masking rules depend on the access level assigned to each role.
+
+## 4. Creating Role-Specific Data Views
+
+The exercise creates separate data views for different user roles.
+
+Each view applies the masking rules associated with that role.
+
+### Junior Analyst
+
+The junior analyst receives a restricted view of the customer dataset.
+
+Sensitive fields are masked according to the assigned access policy.
+
+This allows basic analysis to be performed while limiting exposure to personal information.
+
+### Senior Analyst
+
+The senior analyst receives a different view based on the permissions assigned to the role.
+
+The view provides the information required for more detailed analysis while continuing to apply the defined privacy rules.
+
+### Manager
+
+The manager receives a role-specific view intended for reporting and decision-making.
+
+The information displayed depends on the masking policy configured for the manager role.
+
+**Note:** The exact fields visible to each role depend on the masking rules implemented in the exercise.
+
+## 5. Implementing the Process with Python and Pandas
+
+Python is used to process the customer dataset and apply the role-based masking rules.
+
+Pandas helps load, inspect, transform, and export tabular data.
+
+The workflow includes:
+
+1. Loading the customer dataset.
+2. Identifying the sensitive columns.
+3. Defining the masking rules for each role.
+4. Applying the appropriate rules to create role-specific views.
+5. Exporting the resulting views into CSV files.
+6. Recording access details in an audit log.
+
+Using reusable functions and dictionaries helps organize the masking policies and makes the process easier to maintain.
+
+## 6. Applying Masking Policies
+
+Masking policies define how sensitive fields should be displayed for each role.
+
+A role-specific policy can specify which fields require masking and how the masking should be applied.
+
+Using functions makes it possible to reuse masking logic instead of repeating the same operations for every role.
+
+Dictionaries can be used to organize the policies associated with different roles.
+
+This approach makes the access rules easier to understand and update.
+
+## 7. Exporting Role-Specific CSV Files
+
+After the masking rules are applied, the role-specific data views can be exported into CSV files.
+
+Separate output files make it easier to inspect the information available to each role.
+
+The exported files can also be used for further analysis or for verifying that the masking rules have been applied.
+
+The exercise demonstrates how the same source dataset can produce different views depending on the access role.
+
+## 8. Maintaining an Access Audit Log
+
+An audit log records information about data access and processing activities.
+
+In this exercise, the audit log includes details such as:
+
+- Timestamp of the access activity
+- User role
+- Fields accessed or processed
+
+Audit logging helps maintain a record of how data is being accessed.
+
+It also supports transparency and makes it easier to review access activities.
+
+Combining access controls with audit logging provides an additional layer of accountability when working with sensitive customer information.
+
+## 9. Key Learning Outcomes
+
+Through this exercise, I learned:
+
+- How Role-Based Access Control can restrict data access according to user responsibilities.
+- Why sensitive customer information should not be exposed unnecessarily.
+- How to identify Personally Identifiable Information in a dataset.
+- How data masking can hide or partially hide sensitive values.
+- How different users can receive different views of the same dataset.
+- How Python and Pandas can be used to process customer data.
+- How functions and dictionaries can organize reusable masking policies.
+- How role-specific datasets can be exported into CSV files.
+- Why audit logs are useful for tracking data access.
+- How privacy controls can be incorporated into telecom analytics workflows.
+
+## 10. Conclusion
+
+This exercise demonstrated a basic role-based data protection workflow using Python and Pandas.
+
+By identifying sensitive customer fields, applying masking policies, generating role-specific views, and maintaining an audit log, the exercise showed how customer information can be handled more carefully during analytics tasks.
+
+The main takeaway is that data access should be based on user responsibilities, and sensitive information should be protected through appropriate masking and access-tracking practices.
+
+These concepts are useful in telecom analytics environments where customer datasets may contain personal information that must be handled responsibly.
+
