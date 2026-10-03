@@ -1,4 +1,4 @@
-# Exercise 7: Churn Prediction
+ Exercise 7: Churn Prediction
 
 ## What I Learned
 
@@ -6,7 +6,7 @@ In this exercise, I learned how to build a **customer churn prediction model** u
 
 The main focus was not only on training classification models, but also on understanding the data, identifying **data leakage**, performing feature engineering, comparing different models, and selecting a decision threshold based on business costs.
 
-## 1. Understanding Churn Prediction
+ 1 Understanding Churn Prediction
 
 - Learned how machine learning can be used to predict whether a telecom subscriber is likely to churn.
 - Understood that churn prediction is a **binary classification problem**.
@@ -14,7 +14,7 @@ The main focus was not only on training classification models, but also on under
 - Learned why the churn rate should be checked before modelling.
 - Understood that the class distribution provides an important baseline for evaluating the model.
 
-## 2. Data Loading and Initial Analysis
+ 2 Data Loading and Initial Analysis
 
 - Loaded the `telecom_master.csv` dataset using Pandas.
 - Checked the shape of the dataset and the distribution of the churn target.
@@ -22,7 +22,7 @@ The main focus was not only on training classification models, but also on under
 - Checked the percentage of subscribers belonging to each churn class.
 - Understood why knowing the positive-class rate is important before evaluating classification performance.
 
-## 3. Understanding Data Leakage
+ 3 Understanding Data Leakage
 
 One of the most important concepts I learned in this exercise was **data leakage**.
 
@@ -36,7 +36,7 @@ If the answer is no, that column should not be used for predicting churn.
 
 This helped me understand that a very high model score can sometimes be misleading if the model has access to information that reveals the outcome.
 
-## 4. Performing a Leakage Audit
+ 4 Performing a Leakage Audit
 
 - Audited the dataset column by column before training the models.
 - Considered when each value was recorded or generated.
@@ -46,7 +46,7 @@ This helped me understand that a very high model score can sometimes be misleadi
 - Demonstrated the effect of a suspected leaking feature by training a Random Forest with and without the feature.
 - Compared the ROC-AUC values to understand the effect of leakage on model performance.
 
-## 5. Feature Engineering
+ 5 Feature Engineering
 
 I learned how feature engineering can create a more meaningful representation of existing data.
 
