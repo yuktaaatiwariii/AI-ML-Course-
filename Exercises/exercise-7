@@ -64,3 +64,226 @@ df['complaint_intensity'] = (
     df['complaints_6m'] / (df['tenure_months'] / 6)
 ).clip(lower=1)
 
+This represents complaints relative to the subscriber's tenure.
+
+For example, two complaints for a subscriber who joined recently can indicate a different level of risk compared with two complaints from a subscriber who has been with the company for several years.
+
+I learned that feature engineering can make the signal sharper and easier for both a model and a human to interpret.
+
+ 6. Preparing Numerical and Categorical Features 
+
+Separated numerical and categorical columns using Pandas.
+Identified numerical features that could be processed directly.
+Identified categorical features that required encoding.
+Removed the target column from the input features.
+Excluded the identified leakage columns.
+Excluded customer_id because it is an identifier rather than a meaningful predictive feature.
+Verified that the newly created complaint_intensity feature was included among the numerical features.
+
+7. Train-Test Split
+
+I learned how to divide the dataset into training and testing sets using train_test_split.
+
+The exercise used:
+
+75% training data
+25% testing data
+random_state=42
+stratify=y
+
+The use of stratify=y is important because churn represents a smaller class in the dataset.
+
+It helps maintain a similar churn distribution in both the training and testing datasets.
+
+8. Building a Preprocessing Pipeline
+
+I learned how to use ColumnTransformer and Pipeline to perform preprocessing correctly.
+
+For numerical columns:
+
+Missing values were handled using median imputation.
+Features were standardized using StandardScaler.
+
+For categorical columns:
+
+Missing values were replaced using the most frequent value.
+Categorical values were converted into numerical form using OneHotEncoder.
+
+The preprocessing steps were placed inside the machine-learning pipeline.
+
+This ensures that transformations are fitted using the training data only and prevents information from the test set from leaking into the training process.
+
+9. Training Three Classification Models
+
+In this exercise, I trained and compared three classification algorithms:
+
+Logistic Regression
+Decision Tree
+Random Forest
+
+All three models were trained using the same training and testing split.
+
+This allowed the models to be compared fairly because they were evaluated on identical test data.
+
+10. Comparing Model Performance
+
+The models were compared using several evaluation metrics:
+
+ROC-AUC
+Precision
+Recall
+Accuracy
+
+I learned that a classification model should not be evaluated using only one metric.
+
+The exercise expected the models to have ROC-AUC values around the mid-0.7 range, while recall at the default threshold was expected to be below 0.3.
+
+The comparison table helped understand how the different classifiers performed on the same dataset.
+
+11. Understanding the Confusion Matrix
+
+I learned how to interpret the four components of a confusion matrix:
+
+True Negative (TN): The subscriber was predicted not to churn and actually did not churn.
+False Positive (FP): The subscriber was predicted to churn but actually did not churn.
+False Negative (FN): The subscriber was predicted not to churn but actually churned.
+True Positive (TP): The subscriber was predicted to churn and actually churned.
+
+I also learned that these values should be interpreted from the perspective of the retention team, not just as model statistics.
+
+Each type of prediction has a different business impact.
+
+12. Understanding Business Costs
+
+This exercise showed me that machine-learning decisions can be evaluated using business costs, not just technical metrics.
+
+The exercise provided:
+
+False Negative cost = ₹5,880
+False Positive cost = ₹300
+
+Therefore, missing a customer who eventually churns has a much higher estimated cost than unnecessarily targeting a customer who does not churn.
+
+The approximate cost ratio is:20 : 1
+
+This business ratio becomes important when deciding the classification threshold.
+
+13. Comparing with the Do-Nothing Baseline
+
+I learned why a machine-learning model should be compared with a simple baseline.
+
+The exercise used a baseline where the model predicts that nobody churns.
+
+The baseline accuracy was calculated using:
+
+baseline_accuracy = 1 - y_test.mean()
+
+This demonstrated that accuracy can sometimes appear high simply because the majority class is larger.
+
+Therefore, a high accuracy value alone does not prove that a churn model is useful.
+
+14. Understanding Decision Thresholds
+
+I learned that a classification model produces probabilities of churn, which are then converted into class predictions using a decision threshold.
+
+For example:
+
+Probability of churn = 0.72
+
+At a threshold of 0.5, this subscriber would be classified as likely to churn.
+
+However, changing the threshold changes how many subscribers are flagged.
+
+The exercise tested thresholds from 0.10 to 0.60 in increments of 0.05.
+
+15. Understanding Precision and Recall Trade-off
+
+I learned that changing the decision threshold affects precision and recall.
+
+A lower threshold generally flags more subscribers as potential churners.
+
+This can increase recall because more actual churners may be identified, but it can also increase false positives.
+
+A higher threshold generally flags fewer subscribers.
+
+This can reduce false positives but may cause more actual churners to be missed.
+
+Therefore, the threshold should be selected according to the actual objective of the business.
+
+16. Selecting a Threshold Using Expected Cost
+
+The exercise used the business costs of false negatives and false positives to select an operating point.
+
+The expected cost was calculated using:
+
+Expected Cost =
+(False Negatives × ₹5,880)
++
+(False Positives × ₹300)
+
+The expected cost was calculated for each threshold in the sweep.
+
+The threshold with the lowest expected cost under the stated assumptions can then be considered for the retention strategy.
+
+I learned that the most suitable threshold for a business problem is not necessarily the default 0.5.
+
+17. Importance of Reproducibility
+
+I learned why random_state should be specified when splitting data and training models.
+
+Using a fixed random state makes the experiment reproducible.
+
+This means that the results can be recreated and the models can be compared consistently.
+
+18. Overall Learning
+
+Through this exercise, I learned that building a churn prediction model involves much more than simply training a classifier.
+
+The complete workflow was:
+
+Load Telecom Data
+        ↓
+Check Churn Distribution
+        ↓
+Perform Leakage Audit
+        ↓
+Remove Leaking Features
+        ↓
+Feature Engineering
+        ↓
+Separate Numerical & Categorical Features
+        ↓
+Train-Test Split
+        ↓
+Build Preprocessing Pipeline
+        ↓
+Train 3 Classification Models
+        ↓
+Compare ROC-AUC, Precision, Recall & Accuracy
+        ↓
+Analyze Confusion Matrix
+        ↓
+Compare with Baseline
+        ↓
+Sweep Decision Threshold
+        ↓
+Calculate Business Cost
+        ↓
+Select an Operating Threshold
+Key Takeaway
+
+The main takeaway from this exercise was that a churn prediction model should not be judged only by its accuracy or ROC-AUC.
+
+A reliable churn modelling workflow requires:
+
+Proper data understanding
+Leakage detection
+Meaningful feature engineering
+Correct preprocessing
+Fair model comparison
+Confusion matrix analysis
+Baseline comparison
+Threshold analysis
+Business cost consideration
+
+This exercise helped me understand how a machine-learning model can be connected to a real business decision, where the cost of missing a potential churner can be significantly different from the cost of unnecessarily contacting a customer.
