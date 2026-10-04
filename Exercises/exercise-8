@@ -1,0 +1,381 @@
+# Exercise 8: ARPU Prediction
+
+## What I Learned
+
+In this exercise, I learned how to build a **regression model for predicting Average Revenue Per User (ARPU)** using telecom subscriber data.
+
+Unlike churn prediction, where the target is a classification such as churn or no churn, ARPU is a **continuous numerical value**. Therefore, I learned that regression requires different evaluation metrics, diagnostics, and interpretation techniques.
+
+The main focus of this exercise was to engineer meaningful features from subscriber behaviour, prevent target leakage, compare regression models, analyze residuals, and translate the most important revenue drivers into useful business recommendations.
+
+## 1. Understanding ARPU Prediction
+
+- Learned how machine learning can be used to predict a subscriber's ARPU.
+- Understood that ARPU is a continuous numerical target.
+- Learned that regression models predict numerical values rather than discrete classes.
+- Understood why regression requires metrics such as **RMSE, MAE, and R²**.
+- Learned that simply looking at R² is not enough to understand how well a regression model performs.
+
+## 2. Understanding Target Leakage
+
+One of the most important concepts I learned in this exercise was **target leakage**.
+
+The target variable in this exercise is:
+
+The dataset also contains total_charges, which is closely related to ARPU and tenure.
+
+I checked whether:
+
+implied = df['total_charges'] / df['tenure_months']
+
+was strongly related to the actual ARPU.
+
+This demonstrated that total_charges contains information that can effectively reveal the target.
+
+I learned that a column is not necessarily "bad" data by itself. A feature can be perfectly valid for reporting but still be inappropriate for predicting a particular target.
+
+Therefore, leakage depends on the relationship between the feature and the prediction target.
+
+3. Removing the Leaking Feature
+
+After confirming the relationship between total_charges and ARPU, I removed it from the feature set.
+
+The modelling features excluded:
+
+drop = ['arpu', 'customer_id', 'total_charges', 'churn']
+
+I also removed:
+
+arpu because it is the target variable.
+customer_id because it is an identifier.
+churn because it is not being used as an input for this ARPU prediction task.
+total_charges because it contains information that can reveal the target.
+
+This helped me understand why every excluded feature should have a clear reason.
+
+4. Feature Engineering
+
+I learned that raw measurements do not always provide the most useful representation of subscriber behaviour.
+
+The exercise required creating at least four engineered features.
+
+Tenure Band
+
+I created a categorical tenure_band feature:
+
+df['tenure_band'] = pd.cut(
+    df['tenure_months'],
+    bins=[0, 6, 18, 36, 72],
+    labels=['0-6m', '7-18m', '19-36m', '37m+']
+)
+
+This groups subscribers according to their tenure.
+
+I learned that banding can be useful when the relationship between a variable and revenue may not be purely linear.
+
+Data per Voice
+
+I created:
+
+df['data_per_voice'] = (
+    df['avg_monthly_gb'] /
+    df['avg_voice_min'].clip(lower=1)
+)
+
+This creates a ratio between data usage and voice usage.
+
+It provides a different representation of subscriber behaviour than looking at each usage value independently.
+
+Complaints per Year
+
+I created:
+
+df['complaints_per_yr'] = (
+    df['complaints_6m'] * 2 /
+    (df['tenure_months'] / 12).clip(lower=0.5)
+)
+
+This converts the available complaint information into an annualized measure relative to tenure.
+
+It provides a way to compare complaint behaviour across subscribers with different tenure lengths.
+
+Heavy Data User
+
+I also created:
+
+df['is_heavy_data'] = (
+    df['avg_monthly_gb'] >
+    df['avg_monthly_gb'].quantile(0.75)
+).astype(int)
+
+This identifies subscribers whose average monthly data usage is above the 75th percentile.
+
+I learned that binary or banded features can capture useful behavioural patterns that may not be obvious from raw numerical values.
+
+5. Creating My Own Feature
+
+The exercise also required creating at least one feature of my own design.
+
+I learned that a good engineered feature should represent some meaningful subscriber behaviour rather than simply transforming a column without a reason.
+
+The feature should have a clear justification explaining:
+
+What behaviour it represents.
+Why that behaviour could be related to revenue.
+Why the transformation provides additional information.
+
+This helped me understand that feature engineering is not just about creating more columns; the new features should have a meaningful interpretation.
+
+6. Preparing the Dataset
+
+After feature engineering, I separated the input features and target.
+
+The target was:
+
+arpu
+
+The remaining features were divided into:
+
+Numerical features
+Categorical features
+
+This separation was required because numerical and categorical data need different preprocessing techniques.
+
+7. Building a Preprocessing Pipeline
+
+I reused the pipeline approach from the previous exercise.
+
+For numerical features:
+
+Missing values were handled using median imputation.
+Features were standardized using StandardScaler.
+
+For categorical features:
+
+Missing values were replaced using the most frequent value.
+Categorical variables were encoded using OneHotEncoder.
+
+I learned that placing preprocessing inside a pipeline helps ensure that transformations are learned from the training data rather than the complete dataset.
+
+8. Train-Test Split
+
+I divided the dataset into training and testing sets using:
+
+train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    random_state=42
+)
+
+This created:
+
+75% training data
+25% testing data
+
+I learned that the same split should be used when comparing different regression models so that their results are directly comparable.
+
+9. Training Two Regression Models
+
+In this exercise, I trained and compared two regression models:
+
+Linear Regression
+Random Forest Regressor
+
+Both models were trained using the same training and testing data.
+
+This allowed me to compare their performance fairly.
+
+10. Understanding RMSE
+
+I learned about Root Mean Squared Error (RMSE).
+
+RMSE measures the typical size of prediction errors while giving greater weight to larger errors.
+
+For ARPU prediction, RMSE can be interpreted in terms of rupees, which makes it easier to communicate to a business audience.
+
+For example, an RMSE of ₹40 would indicate that the typical prediction error is on the order of tens of rupees.
+
+The exercise emphasized reporting RMSE in rupees rather than relying only on R².
+
+11. Understanding MAE
+
+I also learned about Mean Absolute Error (MAE).
+
+MAE measures the average absolute difference between the actual ARPU and predicted ARPU.
+
+It provides an easy-to-understand measure of the average prediction error.
+
+Unlike RMSE, MAE does not give as much additional weight to larger errors.
+
+Therefore, comparing RMSE and MAE can provide a better understanding of the model's prediction errors.
+
+12. Understanding R²
+
+I learned that R² (R-squared) measures how much of the variation in the target is explained by the model.
+
+Although R² is useful for evaluating regression performance, the exercise emphasized that it should not be the only metric reported.
+
+A business team is often more interested in questions such as:
+
+How many rupees away from the actual ARPU are our predictions?
+
+This is why RMSE and MAE are important alongside R².
+
+13. Comparing the Regression Models
+
+The two regression models were compared using:
+
+RMSE
+MAE
+R²
+
+The comparison provided a more complete picture of model performance.
+
+I learned that the model with the highest R² is not automatically the most useful model for every business situation.
+
+The expected RMSE was in the range of tens of rupees compared with an average ARPU in the hundreds.
+
+The exercise also highlighted that an unexpectedly high R², such as above 0.98, can be a warning sign that a leaking feature may still be present.
+
+14. Understanding Residuals
+
+One of the most important concepts in this exercise was residual analysis.
+
+A residual represents the difference between the actual value and the predicted value:
+
+Residual = Actual ARPU - Predicted ARPU
+
+The exercise calculated:
+
+resid = y_te - pred
+
+I learned that residuals can reveal problems that may not be visible from R² alone.
+
+15. Residual Plot Analysis
+
+I created residual plots to examine model errors.
+
+The first plot compared:
+
+Predicted ARPU vs Residual
+
+The second plot compared:
+
+Tenure vs Residual
+
+I learned to look for:
+
+Funnel-shaped patterns
+Curvature
+Errors that are not centred around zero
+Systematic patterns across different ranges
+
+A funnel shape can indicate that the model becomes less reliable for higher-ARPU subscribers.
+
+This is especially important because high-ARPU customers may be an important business segment.
+
+16. Checking Errors by Segment
+
+I also learned how to analyze prediction errors across different subscriber groups.
+
+The exercise checked residuals by:
+
+region
+plan_type
+
+The mean and standard deviation of residuals were calculated for each group.
+
+A clearly non-zero mean residual within a group indicates that the model may be systematically under-predicting or over-predicting that segment.
+
+This showed me that a model can perform reasonably overall while still behaving differently for specific customer groups.
+
+17. Identifying Revenue Drivers
+
+I learned how to use permutation importance to identify which features are most associated with the model's predictions.
+
+The exercise used:
+
+from sklearn.inspection import permutation_importance
+
+The importance values were calculated and the top eight features were ranked.
+
+This helped identify the variables that most strongly contributed to the model's predictive performance.
+
+18. Turning Model Results into Business Recommendations
+
+The exercise required taking the top two revenue drivers and converting them into recommendations for a marketing team.
+
+I learned that the final recommendation should avoid technical machine-learning terminology.
+
+Instead of discussing model parameters, the focus should be on questions such as:
+
+Which customer behaviour is associated with higher revenue?
+Which customer segment should the marketing team pay attention to?
+What kind of customer behaviour could be explored through campaigns or offers?
+
+This helped me understand how technical model results can be translated into business decisions.
+
+19. Association Does Not Mean Causation
+
+An important learning point was that feature importance shows association, not causation.
+
+For example, if heavy data usage is identified as an important driver, this does not automatically mean that increasing a customer's data usage will cause their ARPU to increase.
+
+Heavy users may already be subscribed to richer or more expensive plans.
+
+Therefore, I learned that model importance should be interpreted carefully and should not automatically be treated as proof that changing a feature will cause revenue to change.
+
+20. Overall Learning
+
+Through this exercise, I learned that ARPU prediction requires more than simply training a regression model.
+
+The complete workflow was:
+
+Load Telecom Data
+        ↓
+Define ARPU as Target
+        ↓
+Check for Target Leakage
+        ↓
+Remove total_charges
+        ↓
+Engineer Behaviour-Based Features
+        ↓
+Separate Numerical & Categorical Features
+        ↓
+Train-Test Split
+        ↓
+Build Preprocessing Pipeline
+        ↓
+Train Linear Regression
+        ↓
+Train Random Forest Regressor
+        ↓
+Compare RMSE, MAE & R²
+        ↓
+Analyze Residuals
+        ↓
+Check Errors by Region & Plan
+        ↓
+Rank Revenue Drivers
+        ↓
+Convert Drivers into Business Recommendations
+Key Takeaway
+
+The main takeaway from this exercise was that good regression modelling is not only about achieving a high R².
+
+A reliable ARPU prediction workflow requires:
+
+Detecting target leakage
+Creating meaningful behavioural features
+Using a proper preprocessing pipeline
+Comparing multiple regression models
+Evaluating RMSE, MAE and R²
+Studying residuals
+Checking errors across customer segments
+Identifying important revenue drivers
+Distinguishing association from causation
+Translating model findings into actionable business recommendations
+
+This exercise helped me understand how a regression model can move from simply predicting ARPU to explaining where the prediction errors occur and which subscriber behaviours are most strongly associated with revenue.
