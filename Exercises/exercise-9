@@ -1,0 +1,524 @@
+# Exercise 9: Customer Segmentation
+
+## What I Learned
+
+In this exercise, I learned how to perform **customer segmentation using K-Means clustering**, an example of **unsupervised machine learning**.
+
+Unlike supervised learning exercises, where the dataset already contains an answer or target variable, clustering works without predefined labels. The model identifies groups of customers based only on their behaviour and characteristics.
+
+The main objective was to divide the Omantel subscriber base into meaningful marketing groups and understand how those groups could be used for business decisions.
+
+ 1. Understanding Supervised vs Unsupervised Learning
+
+The most important concept I learned was the difference between supervised and unsupervised learning.
+
+In supervised learning:
+
+- The data contains known answers or labels.
+- The model learns patterns from those answers.
+- Examples include predicting churn or predicting a bill amount.
+- The model can be evaluated against the known target.
+
+In unsupervised learning:
+
+- There is no predefined answer.
+- The model searches for patterns or structure in the data.
+- The groups are discovered automatically.
+- The business team interprets and names the resulting groups.
+
+K-Means clustering was used in this exercise as an example of unsupervised learning.
+
+## 2. Understanding Customer Segmentation
+
+I learned how customer segmentation can be used to divide subscribers into groups with similar behaviour.
+
+The dataset contained information such as:
+
+- Tenure
+- Data usage
+- Monthly spending
+- International minutes
+- Roaming days
+- Voice minutes
+
+These behavioural features were used to identify different types of subscribers.
+
+The purpose of segmentation is not simply to create groups, but to find groups that the business can actually understand and act upon.
+
+## 3. Loading and Understanding the Dataset
+
+The exercise used:
+
+The dataset contained 2,500 subscribers and eight columns.
+
+Six behavioural features were selected for clustering:
+
+FEATURES = [
+    'tenure_months',
+    'data_usage_gb',
+    'monthly_spend_omr',
+    'intl_minutes',
+    'roaming_days',
+    'voice_minutes'
+]
+
+The msisdn column was treated as an identifier and was not used for clustering.
+
+The dataset also contained a true_persona column, but I learned that this column must not be given to the clustering algorithm because the purpose of the exercise is to discover the customer groups without using predefined labels.
+
+4. Understanding Why Identifiers Are Not Features
+
+I learned that an identifier such as msisdn should not be used as a clustering feature.
+
+An identifier is used to distinguish records, but it does not represent meaningful customer behaviour.
+
+Including such a column could distort the distance calculations used by K-Means and result in meaningless clusters.
+
+Therefore, only relevant behavioural characteristics should be used for segmentation.
+
+5. First Attempt Without Scaling
+
+I first applied K-Means directly to the raw features.
+
+km_raw = KMeans(
+    n_clusters=4,
+    random_state=42,
+    n_init=10
+)
+
+df['segment_raw'] = km_raw.fit_predict(df[FEATURES])
+
+The resulting clusters were compared using their average feature values.
+
+The result showed that the clusters were almost identical for most features.
+
+The main difference appeared in voice minutes.
+
+This showed that the model was mainly separating customers according to how much they used voice services rather than finding meaningful multi-dimensional customer segments.
+
+6. Understanding Why Scaling Is Necessary
+
+This was one of the most important technical concepts I learned.
+
+K-Means works using distance calculations.
+
+Different features can have very different numerical ranges.
+
+For example:
+
+Roaming days had a much smaller numerical range.
+Monthly spending had a larger range.
+Voice minutes had a much larger range.
+
+Because K-Means calculates distances, features with larger numerical values can have a much greater influence on the clustering process.
+
+Therefore, the model may give too much importance to a feature simply because its numbers are larger.
+
+This does not mean that the feature is actually more important from a business perspective.
+
+7. Understanding StandardScaler
+
+To solve the scaling problem, I used:
+
+scaler = StandardScaler()
+X = scaler.fit_transform(df[FEATURES])
+
+I learned that StandardScaler transforms each feature by:
+
+(value - mean) / standard deviation
+
+After scaling:
+
+Each feature has approximately a mean of 0.
+Each feature has approximately a standard deviation of 1.
+Features are placed on a comparable scale.
+
+This allows K-Means to calculate distances without allowing one feature to dominate simply because of its units.
+
+8. Running K-Means After Scaling
+
+After scaling the features, I ran K-Means again:
+
+km = KMeans(
+    n_clusters=4,
+    random_state=42,
+    n_init=10
+)
+
+df['segment'] = km.fit_predict(X)
+
+The exercise produced four customer groups with different sizes.
+
+This showed that the data contained meaningful structure that was not visible when the raw features were used directly.
+
+The important point was that the algorithm and number of clusters remained the same.
+
+The major change was scaling the features before clustering.
+
+9. Understanding K-Means
+
+I learned that K-Means attempts to divide observations into a specified number of clusters.
+
+In this exercise:
+
+n_clusters = 4
+
+Therefore, the algorithm created four groups.
+
+The model itself does not understand business terminology.
+
+It only assigns numerical labels such as:
+
+0
+1
+2
+3
+
+These numbers do not automatically represent meaningful customer categories.
+
+The business interpretation comes after examining the characteristics of each cluster.
+
+10. Creating a Cluster Profile Table
+
+I used:
+
+df.groupby('segment')[FEATURES].mean().round(1)
+
+to calculate the average characteristics of every segment.
+
+This profile table was the main tool used to understand what each cluster represented.
+
+The resulting profiles showed significant behavioural differences between the four groups.
+
+11. Interpreting the Customer Segments
+
+The four segments were interpreted based on their behavioural characteristics.
+
+Segment 0 — Loyal High-Value
+
+This group had:
+
+Long tenure
+High monthly spending
+Significant international usage
+Moderate data usage
+Relatively low roaming activity
+
+This segment represented long-term, high-value customers.
+
+The business interpretation was Loyal High-Value.
+
+Segment 1 — Heavy-Data Youth
+
+This group had:
+
+Shorter tenure
+Very high data usage
+Lower monthly spending
+Very little international usage
+Low roaming activity
+
+This segment represented customers who consume a large amount of data but have relatively low spending.
+
+The business interpretation was Heavy-Data Youth.
+
+Segment 2 — Low-Use Prepaid
+
+This was the largest group.
+
+It had:
+
+Shorter tenure
+Very low data usage
+Low monthly spending
+Very little international usage
+Very low roaming activity
+
+This group represented lower-value, low-usage subscribers.
+
+The business interpretation was Low-Use Prepaid.
+
+Segment 3 — Frequent Roamer
+
+This group had:
+
+Moderate tenure
+Moderate data usage
+Higher spending
+Very high international usage
+Significantly higher roaming activity
+
+This made it clearly different from the other groups.
+
+The business interpretation was Frequent Roamer.
+
+12. Understanding That the Model Does Not Name the Segments
+
+I learned that K-Means only produces cluster numbers.
+
+For example:
+
+0
+1
+2
+3
+
+The model does not know what those groups mean.
+
+I used a dictionary to assign meaningful names:
+
+names = {
+    0: 'Loyal High-Value',
+    1: 'Heavy-Data Youth',
+    2: 'Low-Use Prepaid',
+    3: 'Frequent Roamer'
+}
+
+The business team is responsible for interpreting the clusters and deciding whether the resulting groups make sense.
+
+This is a key difference between clustering and supervised learning.
+
+13. Understanding Why Business Interpretation Matters
+
+I learned that clustering does not have a traditional accuracy score because there is no predefined answer being predicted.
+
+Instead, the important question is:
+
+Do these groups make business sense, and can the business act on them?
+
+A mathematically generated cluster is not automatically useful.
+
+The clusters need to be interpretable and connected to possible marketing actions.
+
+14. Visualizing the Segments
+
+I created a scatter plot using:
+
+Data usage
+Monthly spending
+
+The plot showed four customer groups visually.
+
+This helped make the segmentation easier to understand.
+
+However, I also learned an important limitation of this visualization.
+
+The clustering was performed using six features, while the plot displayed only two.
+
+Therefore, two groups may appear to overlap on a two-dimensional plot while still being clearly different when all six dimensions are considered.
+
+The visualization is therefore useful for understanding the segmentation, but it is not the complete representation of the clustering.
+
+15. Validating the Clusters
+
+The dataset contained a true_persona column that was intentionally hidden from the model.
+
+After the clustering was completed, the exercise used this column to compare the discovered clusters with the underlying personas.
+
+The comparison showed that the discovered groups closely matched the predefined personas.
+
+For example:
+
+Most customers in Loyal High-Value were actually Business Postpaid.
+The Heavy-Data Youth cluster matched the Heavy-Data Youth persona.
+Most customers in Low-Use Prepaid matched the Low-Use Prepaid persona.
+The Frequent Roamer cluster matched the Frequent Roamer persona.
+
+This demonstrated how clustering can discover meaningful structure without being given the answer beforehand.
+
+16. Understanding the Difference Between Discovery and Validation
+
+I learned that the true_persona column was not used to create the clusters.
+
+It was only used later to check how well the discovered groups matched the underlying personas.
+
+This distinction is important because using true_persona during clustering would turn the exercise into a supervised problem rather than an unsupervised one.
+
+The model had to discover the groups using only customer behaviour.
+
+17. Creating a Segmentation Report
+
+The final segmentation results were combined into a report containing:
+
+Subscriber identifier
+True persona
+Generated segment name
+Customer behavioural features
+
+The results were exported using:
+
+comparison.to_csv(
+    'omantel_segmentation_results.csv',
+    index=False
+)
+
+This created a reusable output file containing the segmentation results.
+
+18. Connecting Segments to Marketing Actions
+
+I learned that segmentation becomes valuable when the business can take different actions for different groups.
+
+Loyal High-Value
+
+Marketing could focus on:
+
+Retention offers
+Priority support
+Protecting the relationship with high-value customers
+Heavy-Data Youth
+
+Marketing could focus on:
+
+Larger data bundles
+Upselling
+Offers designed around high data consumption
+Low-Use Prepaid
+
+Marketing could consider:
+
+Migration offers
+Postpaid conversion opportunities
+Lower-cost engagement strategies
+Frequent Roamer
+
+Marketing could focus on:
+
+Roaming packages
+International offers
+Products designed for frequent international usage
+
+This demonstrated how machine-learning output can be translated into business actions.
+
+19. Understanding the Importance of Feature Selection
+
+Another important learning was that the features selected for clustering define what "similar customers" means.
+
+Adding or removing a feature can change the resulting segments.
+
+Therefore:
+
+Relevant features can help create meaningful segments.
+Irrelevant features can introduce noise.
+Poor-quality features can produce poor clusters.
+Business understanding is important when selecting clustering variables.
+
+I learned that there is no universal definition of a "similar customer." It depends on which characteristics are included in the analysis.
+
+20. Understanding the Role of K in K-Means
+
+The exercise used:
+
+K = 4
+
+which means four clusters were requested.
+
+I learned that choosing the number of clusters is not always purely mathematical.
+
+The elbow method can provide guidance, but the final number should also consider business requirements.
+
+For example, if Marketing can realistically run only a few different campaigns, creating a very large number of segments may not be useful.
+
+Therefore, the number of clusters should be both statistically reasonable and practically actionable.
+
+21. Understanding Unsupervised Learning in Business
+
+This exercise showed me how unsupervised learning can be useful when a business does not already have predefined customer categories.
+
+Instead of telling the algorithm:
+
+"This customer is a Heavy-Data Youth."
+
+we provide customer behaviour and allow the algorithm to discover groups.
+
+The business can then study those groups and decide what they represent.
+
+This makes clustering useful for discovering customer patterns that may not have been identified using manually created rules.
+
+22. From Discovery to Operationalisation
+
+One of the most important concepts at the end of the exercise was the difference between discovery and operationalisation.
+
+Stage 1 — Discover
+
+K-Means is used to discover customer segments.
+
+Customer Behaviour
+        ↓
+K-Means
+        ↓
+Customer Segments
+
+This is unsupervised learning.
+
+Stage 2 — Operationalise
+
+Once the segments have been discovered and named, a supervised classifier can be trained to assign new customers to those segments.
+
+Discovered Segments
+        ↓
+Training Labels
+        ↓
+Classifier
+        ↓
+New Subscriber Segment
+
+This is supervised learning.
+
+The key concept I learned was:
+
+Unsupervised learning discovers the structure, while supervised learning operationalises it.
+
+23. Overall Learning
+
+Through this exercise, I learned that customer segmentation using K-Means involves much more than simply running a clustering algorithm.
+
+The complete workflow was:
+
+Load Subscriber Data
+        ↓
+Select Behavioural Features
+        ↓
+Ignore Identifier & Hidden Labels
+        ↓
+Run K-Means Without Scaling
+        ↓
+Observe the Problem
+        ↓
+Understand Feature Ranges
+        ↓
+Apply StandardScaler
+        ↓
+Run K-Means Again
+        ↓
+Profile Each Cluster
+        ↓
+Interpret Customer Behaviour
+        ↓
+Name the Segments
+        ↓
+Visualize the Groups
+        ↓
+Validate Against Hidden Personas
+        ↓
+Create Marketing Actions
+        ↓
+Export Segmentation Results
+Key Takeaway
+
+The main takeaway from this exercise was that K-Means can discover customer groups without being given predefined labels, but the quality of those groups depends heavily on the features, scaling, and business interpretation.
+
+I learned that:
+
+K-Means is an unsupervised learning technique.
+It groups customers based on similarity and distance.
+Feature scaling is important when variables have different ranges.
+Large numerical values can dominate distance-based algorithms.
+Cluster numbers such as 0, 1, 2, and 3 have no business meaning by themselves.
+The business team must interpret and name the segments.
+There is no traditional accuracy score for an unsupervised clustering task.
+A useful segmentation should be meaningful and actionable.
+The choice of features affects the definition of customer similarity.
+K-Means can be used to discover customer personas that were not provided to the model.
+Discovered segments can later be operationalised using supervised learning.
+
+Overall, this exercise helped me understand how unsupervised learning can be used to discover hidden customer structures and convert them into actionable marketing segments.
